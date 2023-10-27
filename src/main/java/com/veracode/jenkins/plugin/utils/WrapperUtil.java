@@ -21,7 +21,7 @@ public class WrapperUtil {
      * @param id      a {@link java.lang.String} object - the Veracode API ID.
      * @param key     a {@link java.lang.String} object - the Veracode API key.
      */
-    public static final void setupCredential(AbstractAPIWrapper wrapper, String id, String key) {
+    public static void setupCredential(AbstractAPIWrapper wrapper, String id, String key) {
         if (null == wrapper) {
             return;
         }
