@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 
+import jnr.ffi.annotations.In;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -104,6 +105,7 @@ public class VeracodeNotifier extends Notifier {
         private boolean unstablebuild = true;
         private boolean copyremotefiles;
         private boolean autoappname;
+        private Integer scanpollinginterval;
         private boolean autodescription;
         private boolean autoversion;
         private boolean debug;
@@ -146,6 +148,10 @@ public class VeracodeNotifier extends Notifier {
 
         public boolean getAutoappname() {
             return autoappname;
+        }
+
+        public Integer getScanPollingInterval() {
+            return scanpollinginterval;
         }
 
         public boolean getAutodescription() {
@@ -418,6 +424,7 @@ public class VeracodeNotifier extends Notifier {
             autodescription = formData.getBoolean("autodescription");
             autoversion = formData.getBoolean("autoversion");
             debug = formData.getBoolean("debug");
+            scanpollinginterval = formData.getInt("scanpollinginterval");
 
             // the "proxy" optionalBlock in global.jelly uses inline=true, allowing direct
             // access to fields

@@ -38,10 +38,10 @@ public final class UploadAndScanArgs extends AbstractArgs {
     private static final String REPLACEMENT = SWITCH + "replacement";
     private static final String FILEPATH = SWITCH + "filepath";
     private static final String TIMEOUT = SWITCH + "scantimeout";
+    private static final String SCANPOLLINGINTERVAL = SWITCH + "scanpollinginterval";
     private static final String DELETEINCOMPLETESCAN = SWITCH + "deleteincompletescan";
     private static final String MAXRETRYCOUNT = SWITCH + "maxretrycount";
     private static final String DEBUG = SWITCH + "debug";
-
     private static final String CUSTOM_TIMESTAMP_VAR = "timestamp";
     private static final String CUSTOM_BUILD_NUMBER_VAR = "buildnumber";
     public static final String CUSTOM_PROJECT_NAME_VAR = "projectname";
@@ -59,6 +59,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
      *
      * @param bRemoteScan   a boolean.
      * @param appname       a {@link java.lang.String} object.
+     * @param scanpollinginterval an {@link java.lang.Integer} object.
      * @param description   a {@link java.lang.String} object.
      * @param createprofile a boolean.
      * @param teams         a {@link java.lang.String} object.
@@ -75,7 +76,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
      * @param debug         a boolean.
      * @param filepath      a {@link java.lang.String} object.
      */
-    private void addStdArguments(boolean bRemoteScan, String appname, String description,
+    private void addStdArguments(boolean bRemoteScan, String appname, Integer scanpollinginterval, String description,
             boolean createprofile, String teams, String criticality, String sandboxname,
             boolean createsandbox, String version, String include, String exclude, String pattern,
             String replacement, String timeOut, String deleteIncompleteScan, boolean debug, String... filepath) {
@@ -87,8 +88,8 @@ public final class UploadAndScanArgs extends AbstractArgs {
             }
         }
 
-        addStdArguments(appname, description, createprofile, teams, criticality, sandboxname,
-                createsandbox, version, include, exclude, pattern, replacement, deleteIncompleteScan, debug, filepath);
+        addStdArguments(appname, scanpollinginterval, description, createprofile, teams, criticality, sandboxname, createsandbox,
+                        version, include, exclude, pattern, replacement, deleteIncompleteScan, debug, filepath);
     }
 
     /**
@@ -97,6 +98,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
      *
      * @param appname       a {@link java.lang.String} object.
      * @param description   a {@link java.lang.String} object.
+     * @param scanpollinginterval an {@link java.lang.Integer} object.
      * @param createprofile a boolean.
      * @param teams         a {@link java.lang.String} object.
      * @param criticality   a {@link java.lang.String} object.
@@ -111,16 +113,23 @@ public final class UploadAndScanArgs extends AbstractArgs {
      * @param debug         a boolean.
      * @param filepath      a {@link java.lang.String} object.
      */
-    private void addStdArguments(String appname, String description, boolean createprofile,
+    private void addStdArguments(String appname, Integer scanpollinginterval, String description, boolean createprofile,
             String teams, String criticality, String sandboxname, boolean createsandbox,
             String version, String include, String exclude, String pattern, String replacement,
             String deleteIncompleteScan, boolean debug, String... filepath) {
+
         if (!StringUtil.isNullOrEmpty(appname)) {
             list.add(APPNAME);
             list.add(appname);
 
             list.add(CREATEPROFILE);
             list.add(String.valueOf(createprofile));
+        }
+
+        if(scanpollinginterval != null) {
+            if(scanpollinginterval < 10 || scanpollinginterval > 120) { scanpollinginterval = 120; }
+            list.add(SCANPOLLINGINTERVAL);
+            list.add(String.valueOf(scanpollinginterval));
         }
 
         if (!StringUtil.isNullOrEmpty(description)) {
@@ -294,7 +303,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
         }
 
         return newUploadAndScanArgs(bRemoteScan, descriptor.getAutoappname(),
-                descriptor.getAutodescription(), descriptor.getAutoversion(),
+                descriptor.getScanPollingInterval(), descriptor.getAutodescription(), descriptor.getAutoversion(),
                 notifier.getCreatesandbox(), notifier.getCreateprofile(), notifier.getTeams(),
                 descriptor.getProxy(), vId, vKey, build.getDisplayName(),
                 build.getProject().getDisplayName(), notifier.getAppname(),
@@ -353,7 +362,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
             strTimeout = Integer.toString(vpr.timeout);
         }
 
-        return newUploadAndScanArgs(bRemoteScan, autoApplicationName, createAutoApplicationDescription, autoScanName,
+        return newUploadAndScanArgs(bRemoteScan, autoApplicationName, vpr.scanPollingInterval, createAutoApplicationDescription, autoScanName,
                 vpr.createSandbox, vpr.createProfile, vpr.teams, useProxy, vId, vKey, run.getDisplayName(),
                 run.getParent().getFullDisplayName(), vpr.applicationName, vpr.sandboxName, vpr.scanName,
                 vpr.criticality, vpr.scanIncludesPattern, vpr.scanExcludesPattern, vpr.fileNamePattern,
@@ -366,6 +375,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
      *
      * @param bRemoteScan         a boolean.
      * @param autoApplicationName a boolean.
+     * @param scanpollinginterval a {@link java.lang.String} object.
      * @param autoDescription     a boolean.
      * @param autoScanName        a boolean.
      * @param createSandbox       a boolean.
@@ -397,7 +407,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
      * @return a {@link com.veracode.jenkins.plugin.args.UploadAndScanArgs} object.
      */
     public static UploadAndScanArgs newUploadAndScanArgs(boolean bRemoteScan,
-            boolean autoApplicationName, boolean autoDescription, boolean autoScanName,
+            boolean autoApplicationName, Integer scanpollinginterval, boolean autoDescription, boolean autoScanName,
             boolean createSandbox, boolean createProfile, String teams, boolean useProxy,
             String vId, String vKey, String buildNumber, String projectName, String applicationName,
             String sandboxName, String scanName, String criticality, String scanIncludesPattern,
@@ -459,7 +469,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
         if (useProxy) {
             args.addProxyConfiguration(bRemoteScan, envVars, pHost, pPort, pUser, pCredential);
         }
-        args.addStdArguments(bRemoteScan, applicationName, description, createProfile, teams, criticality, sandboxName,
+        args.addStdArguments(bRemoteScan, applicationName, scanpollinginterval, description, createProfile, teams, criticality, sandboxName,
                 createSandbox, scanName, scanIncludesPattern, scanExcludesPattern, fileNamePattern, replacementPattern,
                 timeOut, getDeleteIncompleteScan(deleteIncompleteScan), debug, filePaths);
         args.addUserAgent(UserAgentUtil.getVersionDetails());

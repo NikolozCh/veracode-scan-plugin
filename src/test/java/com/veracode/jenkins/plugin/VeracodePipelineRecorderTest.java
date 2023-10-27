@@ -1,10 +1,6 @@
 package com.veracode.jenkins.plugin;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -64,7 +60,7 @@ public class VeracodePipelineRecorderTest {
     public void testPerform() throws Exception {
 
         VeracodePipelineRecorder veracodePipelineRecorder = new VeracodePipelineRecorder("test_app",
-                "medium", "test_sand_box", "scan1", false, 100, "0", true, "test_team", true, true, true,
+                "medium", 30, "test_sand_box", "scan1", false, 100, "0", true, "test_team", true, true, true,
                 true, true, "**/*.jar", "", "", "", "", "", true, false, "pHost", "pPort", "pUser",
                 "pPassword", "vid", "vkey");
         
@@ -99,8 +95,8 @@ public class VeracodePipelineRecorderTest {
         filePaths[1] = new FilePath(tempFile2);
         
         when(job.getRootDir()).thenReturn(localFile);
-        when(uploadAndScanArgs.newUploadAndScanArgs(anyBoolean(), anyBoolean(), anyBoolean(),
-                anyBoolean(), anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyString(),
+        when(UploadAndScanArgs.newUploadAndScanArgs(anyBoolean(), anyBoolean(), anyInt(), anyBoolean(),
+                anyBoolean(), anyBoolean(), anyBoolean(), anyString(),anyBoolean(), anyString(),
                 anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString(), any(), any(), anyString(), anyString(), anyBoolean(), any()))
@@ -115,7 +111,7 @@ public class VeracodePipelineRecorderTest {
 
         // Pass null value for both upload include and exclude pattern
         VeracodePipelineRecorder veracodePipelineRecorder = new VeracodePipelineRecorder("test_app", "medium",
-                "test_sand_box", "scan1", false, 100, "0", true, "test_team", true, true, false, false, false, null, null, "", "",
+                30, "test_sand_box", "scan1", false, 100, "0", true, "test_team", true, true, false, false, false, null, null, "", "",
                 "", "", false, false, "pHost", "pPort", "pUser", "pPassword", "vid", "vkey");
 
         Run run = PowerMockito.mock(Run.class);
@@ -141,7 +137,7 @@ public class VeracodePipelineRecorderTest {
         File localFile = tempFolder.newFolder("local_directory");
         FilePath sampleFilePath = PowerMockito.spy(new FilePath(remoteFile));
 
-        when(uploadAndScanArgs.newUploadAndScanArgs(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(),
+        when(UploadAndScanArgs.newUploadAndScanArgs(anyBoolean(), anyBoolean(), anyInt(), anyBoolean(), anyBoolean(),
                 anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString(), anyString(), anyString(), any(), any(), anyString(),
@@ -232,7 +228,7 @@ public class VeracodePipelineRecorderTest {
         Method runScanFromRemoteMethod = VeracodePipelineRecorder.class.getDeclaredMethod("runScanFromRemote",
                 Run.class, FilePath.class, TaskListener.class, PrintStream.class);
         runScanFromRemoteMethod.setAccessible(true);
-        VeracodePipelineRecorder recorder = new VeracodePipelineRecorder("applicationName", "criticality", null,
+        VeracodePipelineRecorder recorder = new VeracodePipelineRecorder("applicationName", "criticality", 30, null,
                 "scanName", true, 60, "0", true, null, false, false, true, true, true, "**/**.*", null, "**/**.jar", "**/**.war",
                 null, null, false, true, null, null, null, null, "vid", "vkey");
         boolean success = (boolean) runScanFromRemoteMethod.invoke(recorder, run, filePath, taskListener, printStream);

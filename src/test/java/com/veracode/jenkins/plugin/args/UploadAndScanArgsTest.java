@@ -298,7 +298,7 @@ public class UploadAndScanArgsTest {
         PowerMockito.when(build.getWorkspace()).thenReturn(filePath);
         PowerMockito.when(envVars.expand(any())).thenReturn("anyString");
 
-        return UploadAndScanArgs.newUploadAndScanArgs(false, false, false, false, false, false, "", false, "vid",
+        return UploadAndScanArgs.newUploadAndScanArgs(false, false, 30, false, false, false, false, "", false, "vid",
                 "vkey", "buildnum", "sample_project", "sample_app", "sample_sandbox", "scan", "High", "**/**.java", "",
                 "", "", "phost", "pport", "puser", "pcredential", filePath, envVars, "60", deleteIncompleteScan, true,
                 new String[2]);

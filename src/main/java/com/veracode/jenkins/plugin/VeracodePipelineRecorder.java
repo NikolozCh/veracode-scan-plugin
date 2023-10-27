@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import jenkins.model.Jenkins;
+import jnr.ffi.annotations.In;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -60,6 +62,8 @@ public class VeracodePipelineRecorder extends Recorder implements SimpleBuildSte
     public final String applicationName;
     @DataBoundSetter
     public final String criticality;
+    @DataBoundSetter
+    public final Integer scanPollingInterval;
     @DataBoundSetter
     public final String sandboxName;
     @DataBoundSetter
@@ -125,46 +129,48 @@ public class VeracodePipelineRecorder extends Recorder implements SimpleBuildSte
     /**
      * Constructor for VeracodePipelineRecorder.
      *
-     * @param applicationName       a {@link java.lang.String} object.
-     * @param criticality           a {@link java.lang.String} object.
-     * @param sandboxName           a {@link java.lang.String} object.
-     * @param scanName              a {@link java.lang.String} object.
-     * @param waitForScan           a boolean.
-     * @param timeout               a int.
-     * @param deleteIncompleteScanLevel  a {@link java.lang.String} object.
-     * @param createProfile         a boolean.
-     * @param teams                 a {@link java.lang.String} object.
-     * @param createSandbox         a boolean.
-     * @param timeoutFailsJob       a boolean.
-     * @param canFailJob            a boolean.
-     * @param unstableBuild         a boolean.
-     * @param debug                 a boolean.
-     * @param uploadIncludesPattern a {@link java.lang.String} object.
-     * @param uploadExcludesPattern a {@link java.lang.String} object.
-     * @param scanIncludesPattern   a {@link java.lang.String} object.
-     * @param scanExcludesPattern   a {@link java.lang.String} object.
-     * @param fileNamePattern       a {@link java.lang.String} object.
-     * @param replacementPattern    a {@link java.lang.String} object.
-     * @param copyRemoteFiles       a boolean.
-     * @param useProxy              a boolean.
-     * @param pHost                 a {@link java.lang.String} object.
-     * @param pPort                 a {@link java.lang.String} object.
-     * @param pUser                 a {@link java.lang.String} object.
-     * @param pPassword             a {@link java.lang.String} object.
-     * @param vid                   a {@link java.lang.String} object.
-     * @param vkey                  a {@link java.lang.String} object.
+     * @param applicationName           a {@link String} object.
+     * @param criticality               a {@link String} object.
+     * @param scanPollingInterval       a {@link java.lang.String} object.
+     * @param sandboxName               a {@link String} object.
+     * @param scanName                  a {@link String} object.
+     * @param waitForScan               a boolean.
+     * @param timeout                   an int.
+     * @param deleteIncompleteScanLevel a {@link String} object.
+     * @param createProfile             a boolean.
+     * @param teams                     a {@link String} object.
+     * @param createSandbox             a boolean.
+     * @param timeoutFailsJob           a boolean.
+     * @param canFailJob                a boolean.
+     * @param unstableBuild             a boolean.
+     * @param debug                     a boolean.
+     * @param uploadIncludesPattern     a {@link String} object.
+     * @param uploadExcludesPattern     a {@link String} object.
+     * @param scanIncludesPattern       a {@link String} object.
+     * @param scanExcludesPattern       a {@link String} object.
+     * @param fileNamePattern           a {@link String} object.
+     * @param replacementPattern        a {@link String} object.
+     * @param copyRemoteFiles           a boolean.
+     * @param useProxy                  a boolean.
+     * @param pHost                     a {@link String} object.
+     * @param pPort                     a {@link String} object.
+     * @param pUser                     a {@link String} object.
+     * @param pPassword                 a {@link String} object.
+     * @param vid                       a {@link String} object.
+     * @param vkey                      a {@link String} object.
      */
     @DataBoundConstructor
-    public VeracodePipelineRecorder(String applicationName, String criticality, String sandboxName,
-            String scanName, boolean waitForScan, int timeout, String deleteIncompleteScanLevel, boolean createProfile, String teams,
-            boolean createSandbox, boolean timeoutFailsJob, boolean canFailJob, boolean unstableBuild, boolean debug,
-            String uploadIncludesPattern, String uploadExcludesPattern, String scanIncludesPattern,
-            String scanExcludesPattern, String fileNamePattern, String replacementPattern,
-            boolean copyRemoteFiles, boolean useProxy, String pHost, String pPort, String pUser,
-            String pPassword, String vid, String vkey) {
+    public VeracodePipelineRecorder(String applicationName, String criticality, Integer scanPollingInterval, String sandboxName,
+                                    String scanName, boolean waitForScan, int timeout, String deleteIncompleteScanLevel, boolean createProfile, String teams,
+                                    boolean createSandbox, boolean timeoutFailsJob, boolean canFailJob, boolean unstableBuild, boolean debug,
+                                    String uploadIncludesPattern, String uploadExcludesPattern, String scanIncludesPattern,
+                                    String scanExcludesPattern, String fileNamePattern, String replacementPattern,
+                                    boolean copyRemoteFiles, boolean useProxy, String pHost, String pPort, String pUser,
+                                    String pPassword, String vid, String vkey) {
 
         this.applicationName = applicationName;
         this.criticality = criticality;
+        this.scanPollingInterval = scanPollingInterval;
         this.sandboxName = sandboxName;
         this.scanName = scanName;
         this.timeoutFailsJob = timeoutFailsJob;
@@ -750,6 +756,12 @@ public class VeracodePipelineRecorder extends Recorder implements SimpleBuildSte
                 ? envVars.expand(sandboxName)
                 : sandboxName;
         try {
+            VeracodeNotifier.VeracodeDescriptor globalDescriptor = (VeracodeNotifier.VeracodeDescriptor) Jenkins.get().getDescriptor(VeracodeNotifier.class);
+
+            assert globalDescriptor != null;
+            String vid = globalDescriptor.getGvid();
+            String vkey = globalDescriptor.getGvkey();
+
             String buildInfoXML = WrapperUtil.getBuildInfo(appName, resolvedSandboxName, vid, vkey,
                     proxy);
             String buildId = XmlUtil.parseBuildId(buildInfoXML);
