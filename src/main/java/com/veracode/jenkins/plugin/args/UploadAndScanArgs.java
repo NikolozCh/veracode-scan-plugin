@@ -303,7 +303,7 @@ public final class UploadAndScanArgs extends AbstractArgs {
         }
 
         return newUploadAndScanArgs(bRemoteScan, descriptor.getAutoappname(),
-                descriptor.getScanPollingInterval(), descriptor.getAutodescription(), descriptor.getAutoversion(),
+                notifier.getScanPollingInterval(), descriptor.getAutodescription(), descriptor.getAutoversion(),
                 notifier.getCreatesandbox(), notifier.getCreateprofile(), notifier.getTeams(),
                 descriptor.getProxy(), vId, vKey, build.getDisplayName(),
                 build.getProject().getDisplayName(), notifier.getAppname(),

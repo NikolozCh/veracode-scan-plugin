@@ -77,6 +77,7 @@ public class VeracodeNotifier extends Notifier {
     public static final class VeracodeDescriptor extends BuildStepDescriptor<Publisher> {
 
         private static final String PostBuildActionDisplayText = "Upload and Scan with Veracode";
+        private static final String scanPollingIntervalDisplayName = "Scan Polling Interval";
         private static final String vidDisplayName = "API ID";
         private static final String vkeyDisplayName = "API Key";
         private static final String vidIHelpTextName = "ID";
@@ -105,7 +106,6 @@ public class VeracodeNotifier extends Notifier {
         private boolean unstablebuild = true;
         private boolean copyremotefiles;
         private boolean autoappname;
-        private Integer scanpollinginterval;
         private boolean autodescription;
         private boolean autoversion;
         private boolean debug;
@@ -148,10 +148,6 @@ public class VeracodeNotifier extends Notifier {
 
         public boolean getAutoappname() {
             return autoappname;
-        }
-
-        public Integer getScanPollingInterval() {
-            return scanpollinginterval;
         }
 
         public boolean getAutodescription() {
@@ -424,7 +420,6 @@ public class VeracodeNotifier extends Notifier {
             autodescription = formData.getBoolean("autodescription");
             autoversion = formData.getBoolean("autoversion");
             debug = formData.getBoolean("debug");
-            scanpollinginterval = formData.getInt("scanpollinginterval");
 
             // the "proxy" optionalBlock in global.jelly uses inline=true, allowing direct
             // access to fields
@@ -494,6 +489,7 @@ public class VeracodeNotifier extends Notifier {
     private final String _criticality;
     private final String _sandboxname;
     private final boolean _createsandbox;
+    private final Integer _scanpollinginterval;
     private final String _version;
     private final String _uploadincludespattern;
     private final String _uploadexcludespattern;
@@ -528,6 +524,10 @@ public class VeracodeNotifier extends Notifier {
 
     public String getSandboxname() {
         return EncryptionUtil.decrypt(this._sandboxname);
+    }
+
+    public Integer getScanPollingInterval() {
+        return this._scanpollinginterval;
     }
 
     public boolean getCreatesandbox() {
@@ -949,12 +949,13 @@ public class VeracodeNotifier extends Notifier {
      *                              object.
      */
     @DataBoundConstructor
-    public VeracodeNotifier(String appname, boolean createprofile, String teams, String criticality,
+    public VeracodeNotifier(String appname, Integer scanpollinginterval, boolean createprofile, String teams, String criticality,
             String sandboxname, boolean createsandbox, String version, String filenamepattern,
             String replacementpattern, String uploadincludespattern, String uploadexcludespattern,
             String scanincludespattern, String scanexcludespattern, boolean waitForScan,
             String timeout, String deleteIncompleteScan, CredentialsBlock credentials) {
         this._appname = appname;
+        this._scanpollinginterval = scanpollinginterval;
         this._createprofile = createprofile;
         this._teams = teams;
         this._criticality = criticality;
