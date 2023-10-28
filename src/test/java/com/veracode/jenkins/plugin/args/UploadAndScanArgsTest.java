@@ -37,6 +37,7 @@ public class UploadAndScanArgsTest {
     public void testNewUploadAndScanArgs() throws IOException {
         
         String appName = "test_app";
+        Integer scanpollinginterval = 30;
         boolean createProfile = true;
         String teams = "test_team";
         String criticality = "High";
@@ -63,7 +64,7 @@ public class UploadAndScanArgsTest {
         CredentialsBlock credentials = new CredentialsBlock("v_id", "v_key", "v_user", "v_pass");
         String[] filePaths = new String[2];
         PowerMockito.when(FormValidationUtil.formatTimeout(any())).thenReturn("60");
-        VeracodeNotifier veracodeNotifier = PowerMockito.spy(new VeracodeNotifier(appName,
+        VeracodeNotifier veracodeNotifier = PowerMockito.spy(new VeracodeNotifier(appName, scanpollinginterval,
                 createProfile, teams, criticality, sandboxName, createSandbox, version,
                 filenamePattern, replacementPattern, uploadIncludesPattern, uploadExcludesPattern,
                 scanIncludesPattern, scanExcludesPattern, waitForScan, timeout, deleteIncompleteScan, credentials));
@@ -271,7 +272,7 @@ public class UploadAndScanArgsTest {
         CredentialsBlock credentials = new CredentialsBlock("v_id", "v_key", null, null);
         PowerMockito.when(FormValidationUtil.formatTimeout(any())).thenReturn("60");
         VeracodeNotifier veracodeNotifier = PowerMockito
-                .spy(new VeracodeNotifier("test_app", true, "test_team", "High", "test_sandbox", true, "1.0",
+                .spy(new VeracodeNotifier("test_app", 30, true, "test_team", "High", "test_sandbox", true, "1.0",
                         "**/*.jar", "", "", "", "", "", true, "60", deleteIncompleteScan, credentials));
 
         PowerMockito.doReturn(veracodeDescriptor).when(veracodeNotifier).getDescriptor();
